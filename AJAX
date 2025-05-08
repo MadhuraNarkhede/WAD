@@ -83,4 +83,12 @@ Users.html
 </body>
 </html>
 
+save.php
+<?php
+$data = json_decode(file_get_contents("php://input"), true);
+file_put_contents("users.log", json_encode($data) . PHP_EOL, FILE_APPEND);
+echo json_encode(["status" => "ok"]);
+?>
+
+
 http://localhost:8080/users.html
