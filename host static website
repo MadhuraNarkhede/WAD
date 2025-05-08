@@ -1,0 +1,10 @@
+sudo apt update
+sudo apt install apache2
+sudo systemctl enable apache2
+sudo systemctl start apache2
+sudo systemctl status apache2
+sudo unzip dummy.zip
+cd /var/www/html
+sudo cp -r dummy /var/www/html
+sudo mv index.html /var/www/html
+  
