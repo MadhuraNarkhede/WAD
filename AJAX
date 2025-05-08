@@ -1,0 +1,85 @@
+mkdir vagrant-webapp
+cd vagrant-webapp
+vagrant init ubuntu/jammy64
+mkdir app
+
+configure vagrant file
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+end
+
+Start VM
+vagrant up
+vagrant ssh
+
+Install apache and php in VM
+sudo apt update
+sudo apt install apache2 php -y
+
+
+Link project 
+sudo rm -rf /var/www/html
+sudo ln -s /vagrant/app /var/www/html
+
+index.html
+<!DOCTYPE html>
+<html>
+<head><title>Register</title></head>
+<body>
+  <h2>Register</h2>
+  <form id="regForm">
+    <input id="name" placeholder="Name" required><br><br>
+    <input id="email" type="email" placeholder="Email" required><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById("regForm").onsubmit = function(e) {
+      e.preventDefault();
+      const user = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value
+      };
+      let users = JSON.parse(localStorage.getItem("users") || "[]");
+      users.push(user);
+      localStorage.setItem("users", JSON.stringify(users));
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "save.php");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send(JSON.stringify(user));
+
+      window.location.href = "users.html";
+    };
+  </script>
+</body>
+</html>
+
+Users.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User List</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <h2>User Data</h2>
+  <ul id="list"></ul>
+
+  <script>
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const ul = document.getElementById("list");
+
+    users.forEach(u => {
+      const li = document.createElement("li");
+      li.innerHTML = `Name : ${u.name}<br>Email : ${u.email}`;
+      ul.appendChild(li);
+    });
+  </script>
+</body>
+</html>
+
